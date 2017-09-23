@@ -20,8 +20,7 @@ public class MemoryResource implements Resource {
         mem.close();
     }
 
-    String asString()
-    {
+    public String asString() {
         return mem.toString();
     }
 }

@@ -9,7 +9,8 @@ import java.io.PrintWriter;
 
 public class MemoryResourceSetTest {
 
-    @Test public void testMemoryResourceSet() throws Exception {
+    @Test
+    public void testMemoryResourceSet() throws Exception {
         MemoryResourceSet memSet = new MemoryResourceSet();
         MemoryResource res = (MemoryResource) memSet.open("dash");
         PrintWriter out = res.open();
@@ -18,7 +19,8 @@ public class MemoryResourceSetTest {
         Assert.assertEquals("dash : foo\n", memSet.asString());
     }
 
-    @Test public void testMemoryResourceSetPrintStats() throws IOException {
+    @Test
+    public void testMemoryResourceSetPrintStats() throws IOException {
         MemoryResourceSet memSet = new MemoryResourceSet();
         MemoryResource res = (MemoryResource) memSet.open("dash");
         PrintWriter out = res.open();

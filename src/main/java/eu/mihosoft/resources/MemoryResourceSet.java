@@ -28,8 +28,7 @@ public class MemoryResourceSet implements ResourceSet {
 
     public String asString() {
         StringWriter out = new StringWriter();
-        for (String url : memSet.keySet())
-        {
+        for (String url : memSet.keySet()) {
             out.write(url);
             out.write(" : ");
             out.write(memSet.get(url).asString());
@@ -37,13 +36,11 @@ public class MemoryResourceSet implements ResourceSet {
         return out.toString();
     }
 
-    public void printStats(PrintWriter out)
-    {
+    public void printStats(PrintWriter out) {
         out.println("Resource count: " + memSet.keySet().size());
         out.println("Resource urls: ");
-        for (String url : memSet.keySet())
-        {
-            out.println("- " + url + " (" + memSet.get(url).mem.size()+")");
+        for (String url : memSet.keySet()) {
+            out.println("- " + url + " (" + memSet.get(url).mem.size() + ")");
         }
     }
 }
