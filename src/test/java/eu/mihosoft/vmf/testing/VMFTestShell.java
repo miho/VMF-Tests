@@ -1,6 +1,5 @@
 package eu.mihosoft.vmf.testing;
 
-import com.sun.tools.javac.util.Pair;
 import eu.mihosoft.resources.MemoryResource;
 import eu.mihosoft.resources.MemoryResourceSet;
 import eu.mihosoft.vmf.VMF;
@@ -10,6 +9,8 @@ import org.mdkt.compiler.InMemoryJavaCompiler;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.AbstractMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 public class VMFTestShell {
@@ -26,7 +27,7 @@ public class VMFTestShell {
         compiler.compileAll();
         shell = new GroovyShell(compiler.getClassLoader());
         for (Class cls : classes) {
-            shell.setVariable("a" + cls.getSimpleName(), vmfNewInstance(shell.getClassLoader(), cls).snd);
+            shell.setVariable("a" + cls.getSimpleName(), vmfNewInstance(shell.getClassLoader(), cls).getValue());
         }
     }
 
@@ -62,7 +63,7 @@ public class VMFTestShell {
         if (redFlag) Assert.fail("Expected exception not thrown: " + exceptionType);
     }
 
-    static Pair<Class, Object> vmfNewInstance(ClassLoader cl, Class externalTemplate) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    static Map.Entry<Class, Object> vmfNewInstance(ClassLoader cl, Class externalTemplate) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         String fqn;
         fqn = externalTemplate.getName().replace(".vmfmodel", ".impl").concat("Impl");
         Class implClass = cl.loadClass(fqn);
@@ -72,7 +73,7 @@ public class VMFTestShell {
 
         fqn = externalTemplate.getName().replace(".vmfmodel", "");
         Class pubInterface = cl.loadClass(fqn);
-        return new Pair<Class, Object>(pubInterface, instance);
+        return new AbstractMap.SimpleEntry<Class, Object>(pubInterface, instance);
     }
 
     public void tearDown() {
