@@ -4,6 +4,7 @@ import eu.mihosoft.resources.MemoryResource;
 import eu.mihosoft.resources.MemoryResourceSet;
 import eu.mihosoft.vmf.VMF;
 import groovy.lang.GroovyShell;
+import org.junit.After;
 import org.junit.Assert;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
@@ -20,14 +21,14 @@ public class VMFTestShell {
     public void setUp(Class... classes) throws Throwable {
         codeField = new MemoryResourceSet();
         VMF.generate(codeField, classes);
-        InMemoryJavaCompiler compiler = new InMemoryJavaCompiler();
+        InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance().useIgnoreWarnings();
         for (Map.Entry<String, MemoryResource> entry : codeField.getMemSet().entrySet()) {
             compiler.addSource(entry.getKey(), entry.getValue().asString());
         }
         compiler.compileAll();
-        shell = new GroovyShell(compiler.getClassLoader());
+        shell = new GroovyShell(compiler.getClassloader());
         for (Class cls : classes) {
-            shell.setVariable("a" + cls.getSimpleName(), vmfNewInstance(shell.getClassLoader(), cls).getValue());
+            shell.setVariable("a" + cls.getSimpleName(), vmfNewInstance(compiler.getClassloader(), cls).getValue());
         }
     }
 
@@ -76,6 +77,7 @@ public class VMFTestShell {
         return new AbstractMap.SimpleEntry<Class, Object>(pubInterface, instance);
     }
 
+    @After
     public void tearDown() {
         shell = null;
         codeField = null;
