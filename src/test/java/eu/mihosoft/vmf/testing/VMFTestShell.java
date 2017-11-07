@@ -21,7 +21,7 @@ public class VMFTestShell {
     public void setUp(Class... classes) throws Throwable {
         codeField = new MemoryResourceSet();
         VMF.generate(codeField, classes);
-        InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance().useIgnoreWarnings();
+        InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
         for (Map.Entry<String, MemoryResource> entry : codeField.getMemSet().entrySet()) {
             compiler.addSource(entry.getKey(), entry.getValue().asString());
         }
