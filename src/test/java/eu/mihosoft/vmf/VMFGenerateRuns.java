@@ -1,6 +1,7 @@
 package eu.mihosoft.vmf;
 
 import eu.mihosoft.vmf.testing.VMFTestShell;
+import eu.mihosoft.vmftests.delegationtest.vmfmodel.DelegationTestClass;
 import eu.mihosoft.vmftests.test1.vmfmodel.DaBean;
 import eu.mihosoft.vmftests.test2.vmfmodel.Child;
 import eu.mihosoft.vmftests.test2.vmfmodel.Named;
@@ -66,6 +67,55 @@ public class VMFGenerateRuns extends VMFTestShell {
         assertResult("java.util.Objects.equals(aParent, aCloneParent)", true);
         String str = (String) runScript("aParent.toString()");
         assertResult("aCloneParent.toString()", str);
+    }
+
+    @Test
+    public void testMethodDelegation() throws Throwable {
+        addCode("eu.mihosoft.vmftests.delegationtest.MyBehavior",
+
+                "\n" +
+                "package eu.mihosoft.vmftests.delegationtest;\n" +
+                "public class MyBehavior implements eu.mihosoft.vmf.runtime.core.DelegatedBehavior<DelegationTestClass>{\n" +
+                "\n" +
+                "    private eu.mihosoft.vmftests.delegationtest.DelegationTestClass caller;\n" +
+                "    private boolean constructorCalled;\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void setCaller(DelegationTestClass caller) {\n" +
+                "        this.caller = caller;\n" +
+                "    }\n" +
+                "\n" +
+                "    public boolean nameStartsWith(String string) {\n" +
+                "        if(string==null) {\n" +
+                "            return false;\n" +
+                "        }\n" +
+                "\n" +
+                "        return caller.getName().startsWith(string);\n" +
+                "    }\n" +
+                "\n" +
+                "    public void onDelegationTestClassInstantiated() {\n" +
+                "        constructorCalled = true;\n" +
+                "    }\n" +
+                "\n" +
+                "    public boolean constructorCalled() {\n" +
+                "        return this.constructorCalled;\n" +
+                "    }\n" +
+                "}\n");
+        try {
+            setUp(DelegationTestClass.class);
+        } catch(Exception ex) {
+            String code = findGeneratedCode("eu.mihosoft.vmftests.delegationtest.DelegationTestClass");
+            System.out.println(code);
+            throw ex;
+        }
+
+        assertResult("aDelegationTestClass.constructorCalled()", true);
+        runScript("aDelegationTestClass.setName(\"Father\")");
+        assertResult("aDelegationTestClass.nameStartsWith(\"F\")", true);
+        assertResult("aDelegationTestClass.nameStartsWith(\"G\")", false);
+
+        String code = findGeneratedCode("eu.mihosoft.vmftests.delegationtest.DelegationTestClass");
+        System.out.println(code);
     }
 
 

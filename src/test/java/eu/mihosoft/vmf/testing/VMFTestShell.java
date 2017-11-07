@@ -3,26 +3,50 @@ package eu.mihosoft.vmf.testing;
 import eu.mihosoft.resources.MemoryResource;
 import eu.mihosoft.resources.MemoryResourceSet;
 import eu.mihosoft.vmf.VMF;
+import eu.mihosoft.vmf.core.Resource;
 import groovy.lang.GroovyShell;
 import org.junit.After;
 import org.junit.Assert;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.AbstractMap;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 public class VMFTestShell {
     GroovyShell shell;
     MemoryResourceSet codeField;
 
+    /**
+     * Adds manally implemented code, such as delegated behavior. To add delegation classes, this method must be called
+     * prior to setup. Otherwise the generated code does not contain the delegated behavior and will fail to compile.
+     * @param className name of the class to add
+     * @param code code of the class to add
+     */
+    public void addCode(String className, String code) {
+        // register code, e.g., delegation classes which are necessary for setup
+        Resource res = getCodeField().open(className);
+        try {
+            res.open().append(code).close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    MemoryResourceSet getCodeField() {
+        if(codeField==null) {
+            codeField = new MemoryResourceSet();
+        }
+
+        return codeField;
+    }
+
     public void setUp(Class... classes) throws Throwable {
-        codeField = new MemoryResourceSet();
-        VMF.generate(codeField, classes);
+
+        VMF.generate(getCodeField(), classes);
         InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
-        for (Map.Entry<String, MemoryResource> entry : codeField.getMemSet().entrySet()) {
+        for (Map.Entry<String, MemoryResource> entry : getCodeField().getMemSet().entrySet()) {
             compiler.addSource(entry.getKey(), entry.getValue().asString());
         }
         compiler.compileAll();
@@ -33,15 +57,19 @@ public class VMFTestShell {
     }
 
     public String findGeneratedCode(String resource) {
-        if (codeField.getMemSet().containsKey(resource)) {
-            return codeField.getMemSet().get(resource).asString();
+        if (getCodeField().getMemSet().containsKey(resource)) {
+            return getCodeField().getMemSet().get(resource).asString();
         } else {
             String msg = "Unknown Resource '" + resource + ", try one of the following:\n";
-            for (String key : codeField.getMemSet().keySet()) {
+            for (String key : getCodeField().getMemSet().keySet()) {
                 msg = msg.concat("- ").concat(key).concat("\n");
             }
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    public String getGeneratedCode() {
+        return getCodeField().asString();
     }
 
     public Object runScript(String scriptlet) throws Throwable {
