@@ -48,7 +48,9 @@ public class VMFTestShell {
         VMF.generate(getCodeField(), classes);
         InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
         for (Map.Entry<String, MemoryResource> entry : getCodeField().getMemSet().entrySet()) {
-            compiler.addSource(entry.getKey().replace('/','.').substring(0,entry.getKey().length()-5), entry.getValue().asString());
+            // convert /path/to/File.java to pkg.File
+            compiler.addSource(entry.getKey().replace('/','.').substring(0,entry.getKey().length()-5),
+                    entry.getValue().asString());
         }
 
         compiler.compileAll();
