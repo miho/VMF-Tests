@@ -2,6 +2,7 @@ package eu.mihosoft.vmf.testing;
 
 
 import eu.mihosoft.vmf.VMF;
+import eu.mihosoft.vmf.core.TypeUtil;
 import eu.mihosoft.vmf.core.io.MemoryResource;
 import eu.mihosoft.vmf.core.io.MemoryResourceSet;
 import eu.mihosoft.vmf.core.io.Resource;
@@ -27,7 +28,7 @@ public class VMFTestShell {
      */
     public void addCode(String className, String code) {
         // register code, e.g., delegation classes which are necessary for setup
-        Resource res = getCodeField().open(className);
+        Resource res = getCodeField().open(TypeUtil.computeFileNameFromJavaFQN(className));
         try {
             res.open().append(code).close();
         } catch (IOException e) {
@@ -47,8 +48,9 @@ public class VMFTestShell {
         VMF.generate(getCodeField(), classes);
         InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
         for (Map.Entry<String, MemoryResource> entry : getCodeField().getMemSet().entrySet()) {
-            compiler.addSource(entry.getKey(), entry.getValue().asString());
+            compiler.addSource(entry.getKey().replace('/','.').substring(0,entry.getKey().length()-5), entry.getValue().asString());
         }
+
         compiler.compileAll();
         shell = new GroovyShell(compiler.getClassloader());
         for (Class cls : classes) {
@@ -57,7 +59,8 @@ public class VMFTestShell {
     }
 
     public String findGeneratedCode(String resource) {
-        if (getCodeField().getMemSet().containsKey(resource)) {
+        resource = resource.replace('.','/')+".java";
+        if (getCodeField().getMemSet().containsKey(resource) ){
             return getCodeField().getMemSet().get(resource).asString();
         } else {
             String msg = "Unknown Resource '" + resource + ", try one of the following:\n";
