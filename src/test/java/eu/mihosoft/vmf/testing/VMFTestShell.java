@@ -1,9 +1,10 @@
 package eu.mihosoft.vmf.testing;
 
-import eu.mihosoft.resources.MemoryResource;
-import eu.mihosoft.resources.MemoryResourceSet;
+
 import eu.mihosoft.vmf.VMF;
-import eu.mihosoft.vmf.core.Resource;
+import eu.mihosoft.vmf.core.io.MemoryResource;
+import eu.mihosoft.vmf.core.io.MemoryResourceSet;
+import eu.mihosoft.vmf.core.io.Resource;
 import groovy.lang.GroovyShell;
 import org.junit.After;
 import org.junit.Assert;
@@ -43,7 +44,6 @@ public class VMFTestShell {
     }
 
     public void setUp(Class... classes) throws Throwable {
-
         VMF.generate(getCodeField(), classes);
         InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
         for (Map.Entry<String, MemoryResource> entry : getCodeField().getMemSet().entrySet()) {
