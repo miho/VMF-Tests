@@ -92,6 +92,7 @@ public class VMFTestShell {
             shell.evaluate(scriptlet);
             redFlag = true;
         } catch (Throwable t) {
+            t.printStackTrace(System.err);
             Assert.assertEquals(exceptionType, t.getClass().getSimpleName());
         }
         if (redFlag) Assert.fail("Expected exception not thrown: " + exceptionType);

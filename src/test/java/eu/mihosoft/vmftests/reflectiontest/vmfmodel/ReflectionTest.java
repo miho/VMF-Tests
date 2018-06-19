@@ -1,6 +1,8 @@
 package eu.mihosoft.vmftests.reflectiontest.vmfmodel;
 
 import eu.mihosoft.vcollections.VList;
+import eu.mihosoft.vmf.core.Container;
+import eu.mihosoft.vmf.core.Contains;
 import eu.mihosoft.vmf.core.DefaultValue;
 
 import java.util.Arrays;
@@ -14,6 +16,6 @@ public interface ReflectionTest {
     @DefaultValue("eu.mihosoft.vcollections.VList.newInstance(java.util.Arrays.asList(\"a\",\"b\", \"c\"))")
     String[] getValues();
 
-    int getId2();
+    String getId2();
 
 }
