@@ -2,6 +2,7 @@ package eu.mihosoft.vmf;
 
 import eu.mihosoft.vmf.testing.VMFTestShell;
 import eu.mihosoft.vmftests.delegationtest.vmfmodel.DelegationTestClass;
+import eu.mihosoft.vmftests.reflectiontest.vmfmodel.ReflectionTest;
 import eu.mihosoft.vmftests.test1.vmfmodel.DaBean;
 import eu.mihosoft.vmftests.test2.vmfmodel.Child;
 import eu.mihosoft.vmftests.test2.vmfmodel.Named;
@@ -103,7 +104,7 @@ public class VMFGenerateRuns extends VMFTestShell {
                 "}\n");
         try {
             setUp(DelegationTestClass.class);
-        } catch(Exception ex) {
+        } catch(Throwable ex) {
             String code = findGeneratedCode("eu.mihosoft.vmftests.delegationtest.DelegationTestClass");
             System.out.println(code);
             throw ex;
@@ -116,6 +117,19 @@ public class VMFGenerateRuns extends VMFTestShell {
 
         String code = findGeneratedCode("eu.mihosoft.vmftests.delegationtest.DelegationTestClass");
         System.out.println(code);
+    }
+
+    @Test
+    public void testReflection() throws Throwable {
+
+        setUp(ReflectionTest.class);
+        assertResult("aReflectionTest.getId()==aReflectionTest.vmf().reflect().propertyByName(\"id\").get().get()", true);
+
+        runScript("aReflectionTest.vmf().reflect().propertyByName(\"id\").get().unset()");
+
+        assertResult("aReflectionTest.vmf().reflect().propertyByName(\"id\").get().isSet()", false);
+
+
     }
 
 
