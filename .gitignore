@@ -5,3 +5,9 @@ build
 
 .dropbox.attr
 VMF-Tests.iml
+/.classpath
+/.project
+/.settings
+/bin/
+/out/
+
