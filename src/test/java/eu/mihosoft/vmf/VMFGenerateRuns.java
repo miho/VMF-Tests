@@ -2,6 +2,13 @@ package eu.mihosoft.vmf;
 
 import eu.mihosoft.vmf.testing.VMFTestShell;
 import eu.mihosoft.vmftests.delegationtest.vmfmodel.DelegationTestClass;
+import eu.mihosoft.vmftests.reflectiontest.vmfmodel.InheritedDefaultValue;
+import eu.mihosoft.vmftests.reflectiontest.vmfmodel.InheritedDefaultValueFromTwoParents;
+import eu.mihosoft.vmftests.reflectiontest.vmfmodel.InheritedDefaultValueFromTwoParents2;
+import eu.mihosoft.vmftests.reflectiontest.vmfmodel.InheritedDefaultValueOverride;
+import eu.mihosoft.vmftests.reflectiontest.vmfmodel.InheritedDefaultValueOverride2;
+import eu.mihosoft.vmftests.reflectiontest.vmfmodel.InheritedDefaultValueParent;
+import eu.mihosoft.vmftests.reflectiontest.vmfmodel.InheritedDefaultValueParent2;
 import eu.mihosoft.vmftests.reflectiontest.vmfmodel.Node;
 import eu.mihosoft.vmftests.reflectiontest.vmfmodel.ReflectionTest;
 import eu.mihosoft.vmftests.test1.vmfmodel.DaBean;
@@ -261,5 +268,72 @@ public class VMFGenerateRuns extends VMFTestShell {
 
     }
 
+    @Test
+    public void testInheritedDefaultValue() throws Throwable {
+
+        try {
+
+            setUp(InheritedDefaultValueParent.class, InheritedDefaultValue.class, InheritedDefaultValueOverride.class, InheritedDefaultValueOverride2.class);
+
+            // default should be set
+            assertResult("aInheritedDefaultValueParent.getMyValue()", 123);
+
+            // for inherited as well
+            assertResult("aInheritedDefaultValue.getMyValue()", 123);
+
+        } catch( Throwable tr ) {
+            //String code = findGeneratedCode("eu.mihosoft.vmftests.reflectiontest.impl.ReadOnlyReflectionTestImpl");
+            //System.err.println(code);
+            throw tr;
+        }
+    }
+
+    @Test
+    public void testInheritedDefaultValueWithOverride() throws Throwable {
+
+        try {
+
+            setUp(InheritedDefaultValueParent.class, InheritedDefaultValue.class, InheritedDefaultValueOverride.class, InheritedDefaultValueOverride2.class);
+
+            // for override we expect a different default value
+            assertResult("aInheritedDefaultValueOverride.getMyValue()", -123);
+
+            // for override2 we expect a the default value of int since the feature was redeclared
+            assertResult("aInheritedDefaultValueOverride2.getMyValue()", 0);
+
+
+        } catch( Throwable tr ) {
+            //String code = findGeneratedCode("eu.mihosoft.vmftests.reflectiontest.impl.ReadOnlyReflectionTestImpl");
+            //System.err.println(code);
+            throw tr;
+        }
+
+    }
+
+    @Test
+    public void testInheritedDefaultValueMultipleParents() throws Throwable {
+
+        try {
+
+            setUp(
+             InheritedDefaultValueParent.class,
+             InheritedDefaultValueParent2.class,
+             InheritedDefaultValueFromTwoParents.class,
+             InheritedDefaultValueFromTwoParents2.class
+            );
+
+            // default should be set to inherited default of first interface (order matters in extends I1, I2, ...)
+            assertResult("aInheritedDefaultValueFromTwoParents.getMyValue()", 123);
+
+            // default should be set to inherited default of first interface (order matters in extends I1, I2, ...)
+            assertResult("aInheritedDefaultValueFromTwoParents2.getMyValue()", 456);
+
+        } catch( Throwable tr ) {
+            //String code = findGeneratedCode("eu.mihosoft.vmftests.reflectiontest.impl.ReadOnlyReflectionTestImpl");
+            //System.err.println(code);
+            throw tr;
+        }
+
+    }
 
 }
