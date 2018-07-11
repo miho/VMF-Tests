@@ -1,11 +1,4 @@
-apply plugin: 'java'
-
-sourceCompatibility = '1.8'
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-
-if (!hasProperty('mainClass')) {
-    ext.mainClass = 'eu.mihosoft.vmf.tutorial01.Main'
-}
+import java.text.SimpleDateFormat
 
 buildscript {
     repositories {
@@ -13,6 +6,19 @@ buildscript {
         jcenter()
         mavenLocal()
     }
+}
+
+plugins {
+    id 'com.github.hierynomus.license' version '0.14.0'
+}
+
+apply plugin: 'java'
+
+sourceCompatibility = '1.8'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'eu.mihosoft.vmf.tutorial01.Main'
 }
 
 task wrapper(type: Wrapper) {
@@ -40,4 +46,26 @@ dependencies {
 task run(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = mainClass
+}
+
+license {
+    header = rootProject.file('config/HEADER')
+    strictCheck = true
+    ignoreFailures = true
+    mapping {
+        java   = 'SLASHSTAR_STYLE'
+        groovy = 'SLASHSTAR_STYLE'
+        fxml   = 'XML_STYLE'
+    }
+
+    ext.yearCurrent  = new SimpleDateFormat("yyyy").format(new Date())
+    ext.yearSince1   = '2017'
+    ext.author1 = 'Michael Hoffer <info@michaelhoffer.de>'
+    ext.yearSince2   = '2017'
+    ext.author2= 'Goethe Center for Scientific Computing, University Frankfurt'
+    ext.yearSince3   = '2017'
+    ext.author3 = 'Samuel Michaelis'
+
+
+    exclude '**/*.svg'
 }
