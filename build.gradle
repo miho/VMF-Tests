@@ -66,6 +66,5 @@ license {
     ext.yearSince3   = '2017'
     ext.author3 = 'Samuel Michaelis'
 
-
     exclude '**/*.svg'
 }
